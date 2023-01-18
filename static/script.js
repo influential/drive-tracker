@@ -136,7 +136,7 @@ $(document).ready(function () {
         $("#deleteDriveConfirmBtn").click({selected: selectedDrive}, deleteDrive);
     });
 
-    // $("#driveTable").DataTable({
-    //     order: [[3, 'desc']],
-    // })
+    $("#driveTable").DataTable({
+        order: [[3, 'asc']],
+    })
 });
