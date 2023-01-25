@@ -28,14 +28,17 @@ class Database:
                   str(traceback.format_exception(exc_type, exc_value, exc_tb)))
             self.connection.close()
 
-    def populate_dummy(self):
+    def populate_dummy(self, data):
         try:
-            self.cursor.execute("""
-                INSERT INTO drive_details (serial, ticket_number, manufacturer, date_received, date_to_wipe) VALUES
-                ('HZ90S3', '199189230', 'Seagate', '2022-12-06', '2023-04-05'),
-                ('Z90TS4', '186230142', 'WD', '2022-12-05', '2023-04-04'),
-                ('03TS4X', 'N/A', 'Seagate', '2022-12-13', '2023-04-03')
-            """)
+            query = 'INSERT INTO drive_details (serial, ticket_number, manufacturer, date_received, date_to_wipe, date_received_unix, date_to_wipe_unix) VALUES (?, ?, ?, ?, ?, ?, ?)'
+            # self.cursor.execute("""
+            #     INSERT INTO drive_details (serial, ticket_number, manufacturer, date_received, date_to_wipe) VALUES
+            #     ('HZ90S3', '199189230', 'Seagate', '2022-12-06', '2023-04-05'),
+            #     ('Z90TS4', '186230142', 'WD', '2022-12-05', '2023-04-04'),
+            #     ('03TS4X', 'N/A', 'Seagate', '2022-12-13', '2023-04-03')
+            # """)
+
+            self.cursor.executemany(query, data)
 
             self.connection.commit()
             self.connection.close()

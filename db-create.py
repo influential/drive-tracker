@@ -13,7 +13,9 @@ CREATE TABLE drive_details
     serial TEXT,
     manufacturer TEXT,
     date_received TEXT,
-    date_to_wipe TEXT
+    date_to_wipe TEXT,
+    date_received_unix TEXT,
+    date_to_wipe_unix TEXT
 )
 """)
 

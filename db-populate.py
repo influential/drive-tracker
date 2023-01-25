@@ -1,38 +1,70 @@
-# import sqlite3
-# import sys
-# import traceback
+import string
+import random
+import time
+from datetime import datetime, timedelta
 from Database import Database
-# db_locale = 'drives.db'
 
-# connection = sqlite3.connect(db_locale)
-# c = connection.cursor()
 
-# # c.execute("""
-# # INSERT INTO drive_details (serial, ticket_number, manufacturer, date_received, date_to_wipe) VALUES
-# # ('HZ90S3', '199189230', 'Seagate', '2022-12-6 08:38:00', '2023-4-5 08:38:00'),
-# # ('Z90TS4', '186230142', 'WD', '2022-12-5 09:40:00', '2023-4-4 09:40:00'),
-# # ('03TS4X', 'N/A', 'Seagate', '2022-12-3 10:40:00', '2023-4-3 09:40:00')
-# # """)
+# Generates a date within the specified start and end range
+# Adapted from: https://stackoverflow.com/questions/553303/generate-a-random-date-between-two-other-dates
+def calc_date(start, end, time_format, prop):
+    start_time = time.mktime(time.strptime(start, time_format))
+    end_time = time.mktime(time.strptime(end, time_format))
+    p_time = start_time + prop * (end_time - start_time)
+    return time.strftime(time_format, time.localtime(p_time))
 
-# try:
-#     c.execute("""
-#         INSERT INTO drive_details () VALUES
-#         ('HZ90S3', '199189230', 'Seagate', '2022-12-6 08:38:00', '2023-4-5 08:38:00'),
-#         ('Z90TS4', '186230142', 'WD', '2022-12-5 09:40:00', '2023-4-4 09:40:00'),
-#         ('03TS4X', 'N/A', 'Seagate', '2022-12-3 10:40:00', '2023-4-3 09:40:00')
-#     """)
 
-#     connection.commit()
+def get_random_ticket(length=9):
+    return ''.join(random.choice(string.digits) for i in range(length))
 
-# except sqlite3.Error as err:
-#     exc_type, exc_value, exc_tb = sys.exc_info()
 
-#     print('[-] SQLite Error: %s' % (' '.join(err.args)))
-#     print('[-] SQLite Traceback: ' +
-#           str(traceback.format_exception(exc_type, exc_value, exc_tb)))
+def get_random_serial(length=7):
+    return ''.join(random.choice(string.ascii_uppercase + string.digits) for i in range(length))
 
-# connection.commit()
-# connection.close()
 
+def get_random_manufacturer():
+    options = ['Seagate', 'WD', 'Toshiba', 'Kingston', 'SanDisk']
+    return random.choice(options)
+
+
+def get_random_dates():
+    start = "2022-1-1"
+    end = "2023-12-31"
+    prop = random.random()
+    received = calc_date(start, end, '%Y-%m-%d', prop)
+    to_wipe = datetime.strftime(datetime.strptime(
+        received, '%Y-%m-%d') + timedelta(days=120), '%Y-%m-%d')
+
+    received_unix, to_wipe_unix = get_dates_unix(received, to_wipe)
+    return received, to_wipe, received_unix, to_wipe_unix
+
+
+def get_dates_unix(received, to_wipe):
+    received_unix = time.mktime(
+        datetime.strptime(received, '%Y-%m-%d').timetuple())
+
+    to_wipe_unix = time.mktime(
+        datetime.strptime(to_wipe, '%Y-%m-%d').timetuple())
+
+    return received_unix, to_wipe_unix
+
+
+def build_dummy():
+    serial = get_random_serial()
+    ticketNumber = get_random_ticket()
+    manufacturer = get_random_manufacturer()
+    dateReceived, dateToWipe, dateReceivedUnix, dateToWipeUnix = get_random_dates()
+    return (serial, ticketNumber, manufacturer, dateReceived, dateToWipe, dateReceivedUnix, dateToWipeUnix)
+
+
+def generate_dummy_data():
+    data = []
+    for i in range(30):
+        dummy = build_dummy()
+        data.append(dummy)
+    return data
+
+
+data = generate_dummy_data()
 db = Database()
-db.populate_dummy()
+db.populate_dummy(data)

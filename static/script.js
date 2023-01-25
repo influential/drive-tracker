@@ -137,6 +137,6 @@ $(document).ready(function () {
     });
 
     $("#driveTable").DataTable({
-        order: [[3, 'asc']],
+        order: [[5, 'asc']],
     })
 });

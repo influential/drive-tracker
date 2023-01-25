@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect
 from datetime import datetime, timedelta
+import time
 from Database import Database
 
 app = Flask(__name__)
@@ -10,11 +11,9 @@ app = Flask(__name__)
 def home_page():
     db = Database()
     drive_data = db.get_all()
-
     new_date = datetime.now() + timedelta(days=120)
     new_wipe_date = f'{new_date.month}/{new_date.day}/{new_date.year}'
     current_date = datetime.now()
-
     return render_template('home.html', drive_data=drive_data, date_120_from_now=new_wipe_date, current_date=current_date, new_wipe_date_raw=new_date)
 
 # Route for adding new drives
