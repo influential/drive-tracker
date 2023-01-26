@@ -35,11 +35,17 @@ def home_page():
     data['new_date'] = datetime.now() + timedelta(days=120)
     data['new_wipe_date'] = f'{data["new_date"].month}/{data["new_date"].day}/{data["new_date"].year}'
     data['current_date'] = datetime.now()
+    add_drive_wipe_date = datetime.strftime(data['new_date'], '%Y-%m-%d')
 
     # print(data['new_date'])
     # print(data['ready_stats'])
+    # print(data['new_wipe_date'])
+    # print(data['new_date'])
+    # print(add_drive_wipe_date)
 
-    return render_template('home.html', data=data)
+
+
+    return render_template('home.html', data=data, add_drive_wipe_date=data['new_date'].strftime('%Y-%m-%d'), add_drive_current_date=data['current_date'])
 
 
 # Route for adding new drives
@@ -49,6 +55,7 @@ def add_drive():
 
     if request.method == 'POST':
         # Build new drive based on modal form input
+        print(request.form['dateToWipe'],)
         new_drive = (
             request.form['ticketNumber'],
             request.form['serialNumber'],
