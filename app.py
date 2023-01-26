@@ -5,16 +5,42 @@ from Database import Database
 
 app = Flask(__name__)
 
+
+def enum_dates(dates):
+    result = {
+        'ready_count': 0,
+        'hold_count': 0,
+    }
+    todays_date = time.time()
+    print("todays date:", float(todays_date))
+    for date in dates:
+        print("date:", float(date))
+        if float(date) <= float(todays_date):
+            result['ready_count'] += 1
+        else:
+            result['hold_count'] += 1
+    return result
+
+
+
 # Home page that displays the main drive table
 @app.route('/')
 @app.route('/home')
 def home_page():
+    data = {}
     db = Database()
-    drive_data = db.get_all()
-    new_date = datetime.now() + timedelta(days=120)
-    new_wipe_date = f'{new_date.month}/{new_date.day}/{new_date.year}'
-    current_date = datetime.now()
-    return render_template('home.html', drive_data=drive_data, date_120_from_now=new_wipe_date, current_date=current_date, new_wipe_date_raw=new_date)
+    data['drive_data'] = db.get_all()
+    dates = [d[7] for d in data['drive_data']]
+    data['ready_stats'] = enum_dates(dates)
+    data['new_date'] = datetime.now() + timedelta(days=120)
+    data['new_wipe_date'] = f'{data["new_date"].month}/{data["new_date"].day}/{data["new_date"].year}'
+    data['current_date'] = datetime.now()
+
+    # print(data['new_date'])
+    # print(data['ready_stats'])
+
+    return render_template('home.html', data=data)
+
 
 # Route for adding new drives
 @app.route('/add', methods=['POST'])
@@ -29,6 +55,11 @@ def add_drive():
             request.form['manufacturer'],
             request.form['dateReceieved'],
             request.form['dateToWipe'],
+            
+            # ADD UNIX TIMES TO DB
+            # request.form['dateReceieved'],
+            # request.form['dateToWipe'],
+
         )
         db.insert_drive(new_drive)  # Insert the drive into DB
         return redirect('home')

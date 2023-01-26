@@ -52,15 +52,15 @@
         <div class="container-fluid">
             <div class="row text-center">
                 <div class="col border p-5 m-2 rounded bg-dark text-light fs-5">
-                    <h1>4</h1>
+                    <h1>{{ data['ready_stats']['ready_count'] }}</h1>
                     <p><em>Ready to wipe</em></p>
                 </div>
                 <div class="col border p-5 m-2 rounded bg-dark text-light fs-5">
-                    <h1>10</h1>
-                    <p><em>Ready this week</em></p>
+                    <h1>{{ data['ready_stats']['hold_count'] }}</h1>
+                    <p><em>On hold</em></p>
                 </div>
                 <div class="col border p-5 m-2 rounded bg-dark text-light fs-5">
-                    <h1>{{ date_120_from_now }}</h1>
+                    <h1>{{ data['new_wipe_date'] }}</h1>
                     <p><em>Today + 120 days</em></p>
                 </div>
             </div>
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Modify drive modals (generate a unique form for each drive) -->
-        {% for drive in drive_data %}
+        {% for drive in data['drive_data'] %}
         <div class="modal fade" id="modifyDrive{{drive[0]}}" tabindex="-1" role="dialog" aria-labelledby="modifyDrive{{drive[0]}}" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -218,7 +218,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for drive in drive_data %}
+                    {% for drive in data['drive_data'] %}
                     <tr class='drive-row' role="button" data-bs-toggle="modal" data-bs-target="#modifyDrive{{drive[0]}}">
                         <td id='id' scope="row">{{ drive[0] }}</td>
                         <td id='ticketNumber'>{{ drive[1] }}</td>
@@ -226,10 +226,6 @@
                         <td id='manufacturer'>{{ drive[3] }}</td>
                         <td data-order={{drive[6]}} id='dateReceieved'>{{ drive[4] }}</td>
                         <td data-order={{drive[7]}} id='dateToWipe'>{{ drive[5] }}</td>
-                        <!-- <td>
-                            <button id="modifyDriveBtn" data-bs-toggle="modal" data-bs-target="#modifyDrive{{drive[0]}}" type="button" class="btn btn-dark"><i class="bi-pencil"></i></button>
-                            <button data-bs-toggle="modal" data-bs-target="#deleteDrive"type="button" class="btn btn-danger"><i class="bi-trash3"></i></button>
-                        </td> -->
                     </tr>
                     {% endfor %}
                 </tbody>
