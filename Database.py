@@ -69,7 +69,7 @@ class Database:
 
     def insert_drive(self, drive):
         try:
-            query = 'INSERT INTO drive_details (ticket_number, serial, manufacturer, date_received, date_to_wipe) VALUES (?, ?, ?, ?, ?)'
+            query = 'INSERT INTO drive_details (ticket_number, serial, manufacturer, date_received, date_to_wipe, date_received_unix, date_to_wipe_unix) VALUES (?, ?, ?, ?, ?, ?, ?)'
             self.cursor.execute(query, drive)
             self.connection.commit()
             print(

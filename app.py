@@ -5,22 +5,21 @@ from Database import Database
 
 app = Flask(__name__)
 
-
+# Increments a counter for each date before or equal to today's date
 def enum_dates(dates):
     result = {
         'ready_count': 0,
         'hold_count': 0,
     }
     todays_date = time.time()
-    print("todays date:", float(todays_date))
+    # print("todays date:", float(todays_date))
     for date in dates:
-        print("date:", float(date))
+        # print("date:", float(date))
         if float(date) <= float(todays_date):
             result['ready_count'] += 1
         else:
             result['hold_count'] += 1
     return result
-
 
 
 # Home page that displays the main drive table
@@ -35,7 +34,7 @@ def home_page():
     data['new_date'] = datetime.now() + timedelta(days=120)
     data['new_wipe_date'] = f'{data["new_date"].month}/{data["new_date"].day}/{data["new_date"].year}'
     data['current_date'] = datetime.now()
-    add_drive_wipe_date = datetime.strftime(data['new_date'], '%Y-%m-%d')
+    add_drive_wipe_date = data['new_date'].strftime('%Y-%m-%d')
 
     # print(data['new_date'])
     # print(data['ready_stats'])
@@ -43,9 +42,7 @@ def home_page():
     # print(data['new_date'])
     # print(add_drive_wipe_date)
 
-
-
-    return render_template('home.html', data=data, add_drive_wipe_date=data['new_date'].strftime('%Y-%m-%d'), add_drive_current_date=data['current_date'])
+    return render_template('home.html', data=data, add_drive_wipe_date=add_drive_wipe_date, add_drive_current_date=data['current_date'])
 
 
 # Route for adding new drives
@@ -55,23 +52,21 @@ def add_drive():
 
     if request.method == 'POST':
         # Build new drive based on modal form input
-        print(request.form['dateToWipe'],)
+        received_date_unix = str(time.mktime(datetime.strptime(request.form['dateToWipe'], "%Y-%m-%d").timetuple()))
+        to_wipe_date_unix = str(time.mktime(datetime.strptime(request.form['dateToWipe'], "%Y-%m-%d").timetuple()))
         new_drive = (
             request.form['ticketNumber'],
             request.form['serialNumber'],
             request.form['manufacturer'],
             request.form['dateReceieved'],
             request.form['dateToWipe'],
-            
-            # ADD UNIX TIMES TO DB
-            # request.form['dateReceieved'],
-            # request.form['dateToWipe'],
-
+            received_date_unix,
+            to_wipe_date_unix
         )
         db.insert_drive(new_drive)  # Insert the drive into DB
         return redirect('home')
 
-# Route for removing drives based on serial
+# Route for removing drives based on id
 @app.route('/delete', methods=['POST'])
 def delete_drive():
     db = Database()
@@ -80,14 +75,14 @@ def delete_drive():
         # Get drive data from selected row
         drive = request.form
         drive_id = drive['id']
-        print("SERIAL FROM FRONTEND:", drive_id)
+        print("ID FROM FRONTEND:", drive_id)
 
-        # Remove drive based on selected serial
+        # Remove drive based on selected id
         db.delete_drive(drive_id)
         return redirect('home')
 
 
-# Route for modifying drives based on serial
+# Route for modifying drives based on id
 @app.route('/modify', methods=['POST'])
 def modify_drive():
     db = Database()
