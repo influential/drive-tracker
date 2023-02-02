@@ -9,6 +9,13 @@ class Database:
         self.connection = sqlite3.connect(self.db_locale)
         self.cursor = self.connection.cursor()
 
+    def error(self, err):
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        print('[-] SQLite Error: %s' % (' '.join(err.args)))
+        print('[-] SQLite Traceback: ' + str(traceback.format_exception(exc_type, exc_value, exc_tb)))
+        self.connection.close()
+        return err.args
+
     def get_all(self):
         try:
             query = 'SELECT * FROM drive_details'
@@ -22,12 +29,8 @@ class Database:
             return drive_data
 
         except sqlite3.Error as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
-
+            self.error(err)
+            
     def populate_dummy(self, data):
         try:
             query = 'INSERT INTO drive_details (serial, ticket_number, manufacturer, date_received, date_to_wipe, date_received_unix, date_to_wipe_unix) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -45,12 +48,8 @@ class Database:
             print("[+] Populated `drive_data` with dummy data")
 
         except sqlite3.Error as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
-
+            self.error(err)
+            
     def drop_all(self):
         try:
             query = 'DELETE FROM drive_details'
@@ -60,12 +59,7 @@ class Database:
             print("[+] Dropped all records from drive_details")
 
         except sqlite3.Error as err:
-            self.connection.close()
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
+            self.error(err)
 
     def insert_drive(self, drive):
         try:
@@ -77,11 +71,7 @@ class Database:
             self.connection.close()
 
         except sqlite3.Error as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
+            self.error(err)
 
     def delete_drive(self, drive_id):
         try:
@@ -94,11 +84,7 @@ class Database:
             self.connection.close()
 
         except sqlite3.Error as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
+            self.error(err)  
 
     def modify_drive(self, drive):
         try:
@@ -123,9 +109,4 @@ class Database:
             return
 
         except sqlite3.Error as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            print('[-] SQLite Error: %s' % (' '.join(err.args)))
-            print('[-] SQLite Traceback: ' +
-                  str(traceback.format_exception(exc_type, exc_value, exc_tb)))
-            self.connection.close()
-            return (' '.join(err.args))
+            self.error(err)
