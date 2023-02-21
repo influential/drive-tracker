@@ -1,7 +1,8 @@
 import sqlite3
 import traceback
 import sys
-
+import time
+import math
 
 class Database:
     def __init__(self):
@@ -87,6 +88,7 @@ class Database:
             self.error(err)  
 
     def modify_drive(self, drive):
+
         try:
             print("INSIDE DATABASE MODIFY")
 
@@ -110,3 +112,15 @@ class Database:
 
         except sqlite3.Error as err:
             self.error(err)
+
+    def backup(self):
+        def progress(status, remaining, total):
+            print(f'Copied {total-remaining} of {total} pages...')
+
+        timestamp = math.floor(time.time())
+        src = sqlite3.connect('drives.db')
+        dst = sqlite3.connect(f'backups/drives-backup-{timestamp}.db')
+        with dst:
+            src.backup(dst, pages=1, progress=progress)
+        dst.close()
+        src.close()
